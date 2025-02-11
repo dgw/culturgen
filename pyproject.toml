@@ -11,7 +11,7 @@ readme = { file = ["README.md", "NEWS.md"], content-type = "text/markdown" }
 
 [project]
 name = "culturgen"
-version = "0.1.0"
+version = "0.2.0"
 description = "Know Your Meme scraper, a rewrite of memedict."
 authors = [
     { name = "dgw", email = "dgw@technobabbl.es" },
@@ -19,7 +19,7 @@ authors = [
 license = { text = "MIT" }
 dynamic = ["readme"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
