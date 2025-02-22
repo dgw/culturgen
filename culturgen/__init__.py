@@ -33,7 +33,11 @@ def search_meme(text, user_agent=None):
 def search(text, user_agent=None):
     """Return a meme definition from keywords."""
     meme_name, url = search_meme(text, user_agent=user_agent)
-    if meme_name and SequenceMatcher(None, text, meme_name).ratio() >= SEARCH_SIMILARITY_THRESHOLD:
+    if meme_name and SequenceMatcher(
+        # .lower() is needed to make the comparison case-insensitive
+        # otherwise the ratio for e.g. 'OMGWTFBBQ' and 'omgwtfbbq' is 0.0
+        None, text.lower(), meme_name.lower()
+    ).ratio() >= SEARCH_SIMILARITY_THRESHOLD:
         r = requests.get(url, headers=_make_headers(user_agent))
         soup = BeautifulSoup(r.text, 'html.parser')
         entry = soup.find('h2', {'id': 'about'})
