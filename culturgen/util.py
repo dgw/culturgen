@@ -1,8 +1,17 @@
 """Utility functions for the culturgen library."""
 from __future__ import annotations
 
+import re
+from typing import TYPE_CHECKING
+
 from bs4 import BeautifulSoup
+from jellyfish import jaro_winkler_similarity as jw_ratio
 import requests
+
+from .types import Meme, TitleResult
+
+if TYPE_CHECKING:
+    from typing import Generator
 
 
 DEFAULT_HEADERS = {
@@ -32,6 +41,21 @@ def get_headers(user_agent: str | None = None) -> dict[str, str]:
 
 
 def get_meme(
+    slug_or_url: str,
+    user_agent: str | None = None,
+) -> Meme:
+    """Get a meme object from its slug or URL.
+
+    :param slug_or_url: The slug or full KYM URL of the meme page to fetch.
+    :param user_agent: Optional custom user agent string to use in the headers.
+    :return: A :class:`~.types.Meme` object representing the meme page.
+    :raises ValueError: If the ``Meme`` object couldn't instantiate itself
+                        (probably because the given page doesn't exist).
+    """
+    return Meme(slug_or_url, user_agent=user_agent)
+
+
+def get_meme_page(
     slug_or_url: str,
     user_agent: str | None = None,
 ) -> BeautifulSoup | None:
@@ -107,16 +131,19 @@ def get_meme_title(soup: BeautifulSoup) -> str | None:
 def title_search(
     query: str,
     user_agent: str | None = None,
-) -> dict[str, str]:
+) -> Generator[TitleResult, None, None]:
     """Search Know Your Meme by title keywords.
 
     :param query: The search keyword(s).
     :param user_agent: Optional custom user agent string to use in the headers.
-    :return: A dictionary containing the title and URL of up to 10 results.
+    :return: An :term:`iterable` of up to 10 :class:`TitleResult` tuples.
 
     This function uses the "quick links" endpoint from KYM's search bar. On the
     one hand, that isn't a public API, so it could break at any time. On the
     other hand… HTML scraping can break too, if the page structure changes.
+
+    Results are filtered to only include standard meme pages (not under subpaths
+    like ``/memes/people/``).
     """
     r = requests.get(
         # uses http:// instead of https:// on purpose
@@ -127,15 +154,23 @@ def title_search(
             'query': query,
             'field': 'name',
             'fetch': 'name,url',
-            'len': 10,
+            'len': '10',
         },
     )
     try:
         data = r.json()
     except ValueError:
-        return {}
+        return
 
-    return {
-        item['name']: 'https://knowyourmeme.com' + item['url']
+    yield from (
+        TitleResult(
+            item['name'],
+            'https://knowyourmeme.com' + item['url'],
+            # .lower()ing both makes the similarity check case-insensitive,
+            # which is better for most use cases (e.g. users lazily typing
+            # queries in all lowercase)
+            jw_ratio(query.lower(), item['name'].lower()),
+        )
         for item in data['results']
-    }
+        if re.match(r'/memes/[^/]+/?$', item['url'], re.I)
+    )
