@@ -20,6 +20,10 @@ and design/implementation missteps to correct.
 * Extracted some lower-level logic into a `util` submodule (not considered
   public API; available functions and their behavior subject to change!)
 
+### 0.1.1
+
+* Made similarity threshold check case-insensitive
+
 ### 0.1.0
 
 * Updated to fix apparent changes from KYM that broke the old library
