@@ -25,6 +25,7 @@ def search_meme(
     :param user_agent: Optional custom user agent string to use in the headers.
     :return: A :class:`~.types.Meme` object representing the meme page, or
              ``None`` if no close enough result was found.
+    :raises ValueError: If ``threshold`` is outside the valid range.
     """
     if not (results := util.title_search(text, user_agent=user_agent)):
         return None
@@ -32,6 +33,9 @@ def search_meme(
     if threshold is None:
         # without a similarity threshold, just take the generator's first item
         return Meme(next(results).url)
+
+    if threshold < 0.0 or threshold > 1.0:
+        raise ValueError('threshold must be in the range [0.0, 1.0]')
 
     # this is where it gets interesting
     ranked = sorted(
