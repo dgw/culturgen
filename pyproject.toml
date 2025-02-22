@@ -32,6 +32,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies = [
-    "requests>=2.10",
     "beautifulsoup4>=4.5",
+    "jellyfish~=1.1",
+    "requests>=2.10",
 ]

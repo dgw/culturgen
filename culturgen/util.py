@@ -1,11 +1,11 @@
 """Utility functions for the culturgen library."""
 from __future__ import annotations
 
-from difflib import SequenceMatcher
 import re
 from typing import TYPE_CHECKING
 
 from bs4 import BeautifulSoup
+from jellyfish import jaro_winkler_similarity as jw_ratio
 import requests
 
 from .types import Meme, TitleResult
@@ -166,7 +166,10 @@ def title_search(
         TitleResult(
             item['name'],
             'https://knowyourmeme.com' + item['url'],
-            SequenceMatcher(None, query, item['name']).ratio(),
+            # .lower()ing both makes the similarity check case-insensitive,
+            # which is better for most use cases (e.g. users lazily typing
+            # queries in all lowercase)
+            jw_ratio(query.lower(), item['name'].lower()),
         )
         for item in data['results']
         if re.match(r'/memes/[^/]+/?$', item['url'], re.I)

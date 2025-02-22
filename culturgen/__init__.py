@@ -21,7 +21,7 @@ def search_meme(
 
     :param text: The text to search for in the Know Your Meme database.
     :param threshold: Optional similarity threshold for a match to be considered
-                      successful. Passed to :class:`difflib.SequenceMatcher`\\.
+                      successful. Valid range of 0.0 to 1.0, inclusive.
     :param user_agent: Optional custom user agent string to use in the headers.
     :return: A :class:`~.types.Meme` object representing the meme page, or
              ``None`` if no close enough result was found.
@@ -47,14 +47,15 @@ def search_meme(
 def search(
     text: str,
     *,  # keyword-only after this point
-    threshold: float | None = 0.4,
+    threshold: float | None = 0.5,
     user_agent: str | None = None,
 ) -> str | None:
     """Return a meme definition from keywords.
 
     :param text: The text to search for in the Know Your Meme database.
-    :param threshold: Optional similarity threshold for title matches. Defaults
-                      to ``0.4``; pass ``threshold=None`` to disable.
+    :param threshold: Optional similarity threshold for title matches. Valid
+                      range of 0.0 to 1.0, inclusive. Defaults to ``0.5``; pass
+                      ``threshold=None`` to disable.
     """
     if (meme := search_meme(
         text,
