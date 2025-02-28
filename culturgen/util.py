@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from jellyfish import jaro_winkler_similarity as jw_ratio
 import requests
 
-from .types import Meme, TitleResult
+from .types import AbstractEntry, Event, Meme, TitleResult
 
 if TYPE_CHECKING:
     from typing import Generator
@@ -43,14 +43,14 @@ def get_headers(user_agent: str | None = None) -> dict[str, str]:
 def get_meme(
     slug_or_url: str,
     user_agent: str | None = None,
-) -> Meme:
-    """Get a meme object from its slug or URL.
+) -> AbstractEntry:
+    """Get an entry from its slug or URL.
 
-    :param slug_or_url: The slug or full KYM URL of the meme page to fetch.
+    :param slug_or_url: The slug or full KYM URL of the entry page to fetch.
     :param user_agent: Optional custom user agent string to use in the headers.
-    :return: A :class:`~.types.Meme` object representing the meme page.
-    :raises ValueError: If the ``Meme`` object couldn't instantiate itself
-                        (probably because the given page doesn't exist).
+    :return: A :class:`~.types.AbstractEntry` subtype representing the page.
+    :raises ValueError: If the object couldn't instantiate itself (probably
+                        because the given page doesn't exist).
     """
     return Meme(slug_or_url, user_agent=user_agent)
 
@@ -59,12 +59,16 @@ def get_meme_page(
     slug_or_url: str,
     user_agent: str | None = None,
 ) -> BeautifulSoup | None:
-    """Get a meme page object from its slug or URL.
+    """Get an entry page object from its slug or URL.
 
-    :param slug_or_url: The slug or full KYM URL of the meme page to fetch.
+    :param slug_or_url: The slug or full KYM URL of the entry page to fetch.
     :param user_agent: Optional custom user agent string to use in the headers.
-    :return: A BeautifulSoup object representing the meme page, or ``None`` if
+    :return: A BeautifulSoup object representing the entry page, or ``None`` if
              the page couldn't be fetched.
+
+    This function relies on KYM redirecting ``/memes/:slug`` to
+    ``/memes/:type/:slug`` for us if necessary. Subtypes that don't do so won't
+    work with this function.
     """
     if slug_or_url.startswith('https:'):
         url = slug_or_url
