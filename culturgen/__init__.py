@@ -26,7 +26,9 @@ def search_meme(text, user_agent=None):
     soup = BeautifulSoup(r.text, 'html.parser')
     result = soup.find('a', class_='item', href=True)
     if result:
-        return result['data-title'], result['href']
+        # href attribute is relative (yay saving a few hundred bytes per page!),
+        # so prepend the base URL
+        return result['data-title'], 'https://knowyourmeme.com' + result['href']
     return None, None
 
 
