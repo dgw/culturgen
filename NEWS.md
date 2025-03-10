@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.1.2
+
+* Fixed incorrect return value format of `search_meme()` URL field
+
 ### 0.1.1
 
 * Made similarity threshold check case-insensitive

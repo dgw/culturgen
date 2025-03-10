@@ -11,7 +11,7 @@ readme = { file = ["README.md", "NEWS.md"], content-type = "text/markdown" }
 
 [project]
 name = "culturgen"
-version = "0.1.1"
+version = "0.1.2"
 description = "Know Your Meme scraper, a rewrite of memedict."
 authors = [
     { name = "dgw", email = "dgw@technobabbl.es" },
