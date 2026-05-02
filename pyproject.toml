@@ -11,7 +11,7 @@ readme = { file = ["README.md", "NEWS.md"], content-type = "text/markdown" }
 
 [project]
 name = "culturgen"
-version = "0.2.0"
+version = "0.3.0.dev0"
 description = "Know Your Meme scraper, a rewrite of memedict."
 authors = [
     { name = "dgw", email = "dgw@technobabbl.es" },
@@ -32,8 +32,9 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
 ]
 dependencies = [
-    "requests>=2.10",
     "beautifulsoup4>=4.5",
+    "jellyfish~=1.1",
+    "requests>=2.10",
 ]
 
 [project.urls]
