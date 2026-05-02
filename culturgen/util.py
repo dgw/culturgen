@@ -56,7 +56,7 @@ def get_meme(
     return BeautifulSoup(r.text, 'html.parser')
 
 
-def extract_section_text(soup, section_id: str) -> str | None:
+def extract_section_text(soup: BeautifulSoup, section_id: str) -> str | None:
     """Extract the text of a section from a Know Your Meme page.
 
     :param soup: BeautifulSoup object representing the page to extract from.
@@ -64,15 +64,49 @@ def extract_section_text(soup, section_id: str) -> str | None:
     :return: The text contents of all paragraphs in the section, or ``None`` if
              the ``section_id`` isn't found. Inserts spaces between paragraphs.
     """
-    section = soup.css.select(f'#{section_id} ~ p:not([id!={section_id}] ~ *)')
-    if not section:
+    # Some of this implementation was generated with help from Claude, as a
+    # constrained experiment to see how "AI" (note: still basically just a giant
+    # autocomplete) tools are evolving. I wrote an original implementation using
+    # CSS selectors that didn't work very well, concluded that it was not likely
+    # to be fixable in pure CSS, and asked Claude to take a look. It suggested
+    # this imperative approach.
+    #
+    # The results were good, but not perfect. I manually fixed an issue with
+    # extra spaces, for example: instead of `sibling.text`, Claude wanted to use
+    # `' '.join(sibling.stripped_strings)`, which interacted strangely with
+    # inline elements. Claude also didn't want to use := for some reason, which
+    # I like because the code looks a bit cleaner.
+    #
+    # Overall I think the experiment was worthwhile, and yielded much better
+    # behavior than what was here before. But at the end of this session, before
+    # cleaning up the code, I made Claude give me the link to documentation it
+    # referenced for `next_siblings` because I'd never used that before and
+    # wanted to LEARN about it. I still prefer to write my own damn code. The
+    # point of writing these side projects is the learning, just as much as the
+    # "useful package" that I might create (or not).
+    #
+    # (There's some irony in how many AI-assisted autocomplete suggestions from
+    # VS Code I had to ignore while writing this comment block about why I still
+    # prefer to write things myself...)
+    if section_header := soup.select_one(f'[id="{section_id}" i]') is None:
         return None
 
-    out = ''
-    for p in section:
-        out += p.text + ' '
+    paragraph_texts: list[str] = []
+    for sibling in section_header.next_siblings:
+        tag_name = getattr(sibling, 'name', None)
 
-    return out.rstrip()
+        # Stop when we hit the next heading.
+        if tag_name in {'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}:
+            break
+
+        if tag_name == 'p':
+            if text := sibling.text:
+                paragraph_texts.append(text)
+
+    if not paragraph_texts:
+        return None
+
+    return ' '.join(paragraph_texts)
 
 
 # "About" is the most common section needed, so it gets a dedicated function.
