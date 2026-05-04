@@ -1,5 +1,10 @@
 ## Changelog
 
+### 0.2.1
+
+* Reworked utility function responsible for fetching section text
+* Modernized package metadata
+
 ### 0.2.0
 
 This version drops the development status back to "4 - Beta" because of some
