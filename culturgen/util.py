@@ -88,7 +88,7 @@ def extract_section_text(soup: BeautifulSoup, section_id: str) -> str | None:
     # (There's some irony in how many AI-assisted autocomplete suggestions from
     # VS Code I had to ignore while writing this comment block about why I still
     # prefer to write things myself...)
-    if section_header := soup.select_one(f'[id="{section_id}" i]') is None:
+    if (section_header := soup.select_one(f'[id="{section_id}" i]')) is None:
         return None
 
     paragraph_texts: list[str] = []
