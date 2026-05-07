@@ -1,5 +1,9 @@
 ## Changelog
 
+### 0.2.2
+
+* Fixed syntax mistake in section text fetching...
+
 ### 0.2.1
 
 * Reworked utility function responsible for fetching section text
